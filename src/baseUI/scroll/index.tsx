@@ -68,7 +68,7 @@ const Scroll = forwardRef<any, PropsWithChildren<ScrollProps>>((props, ref) => {
   useEffect(() => {
     if (!bScroll || !onScroll) return;
     bScroll.on("scroll", (scroll: any) => {
-      console.log("scroll", scroll);
+      // console.log("scroll", scroll);
 
       onScroll(scroll);
     });
