@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../index";
 import type { IRecommend } from "../../../types/api/recommend";
@@ -8,11 +8,13 @@ import { getBannerList, getRecommendList } from "./services";
 interface IRecommendState {
   bannerList: IBanner[];
   recommendList: IRecommend[];
+  enterLoading: boolean;
 }
 
 const initialState: IRecommendState = {
   bannerList: [],
   recommendList: [],
+  enterLoading: true,
 };
 
 export const recommendSlice = createSlice({
@@ -24,6 +26,9 @@ export const recommendSlice = createSlice({
     },
     changeRecommendList: (state, action: PayloadAction<IRecommend[]>) => {
       state.recommendList = action.payload;
+    },
+    changeEnterLoading: (state, action: PayloadAction<boolean>) => {
+      state.enterLoading = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -37,11 +42,19 @@ export const recommendSlice = createSlice({
 
     builder.addCase(getRecommendList.fulfilled, (state, action) => {
       state.recommendList = action.payload.result;
+      // state.enterLoading = false; // 关闭loading
     });
 
     builder.addCase(getRecommendList.rejected, (state, action) => {
       console.log("推荐歌单数据传输错误", action.error);
     });
+
+    builder.addMatcher(
+      isAnyOf(getRecommendList.fulfilled, getRecommendList.rejected),
+      (state, action) => {
+        state.enterLoading = false;
+      }
+    );
   },
 });
 
@@ -49,7 +62,10 @@ export const selectBannerList = (state: RootState) =>
   state.recommend.bannerList;
 export const selectRecommendList = (state: RootState) =>
   state.recommend.recommendList;
+export const selectEnterLoading = (state: RootState) =>
+  state.recommend.enterLoading;
 
-export const { changeBanner, changeRecommendList } = recommendSlice.actions;
+export const { changeBanner, changeRecommendList, changeEnterLoading } =
+  recommendSlice.actions;
 
 export default recommendSlice.reducer;

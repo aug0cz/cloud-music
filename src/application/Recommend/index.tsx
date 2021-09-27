@@ -1,12 +1,17 @@
 import React, { memo, useEffect } from "react";
+import { forceCheck } from "react-lazyload";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+
 import Slider from "../../components/slider";
 import RecommendList from "../../components/list";
 import Scroll from "../../baseUI/scroll";
+import Loading from "../../baseUI/loading";
 
 import {
   selectBannerList,
   selectRecommendList,
+  selectEnterLoading,
+  changeEnterLoading,
 } from "../../store/features/recommend/slice";
 import {
   getBannerList,
@@ -20,16 +25,27 @@ const Recommend: React.FC = () => {
 
   const recommendList = useAppSelector(selectRecommendList);
   const bannerList = useAppSelector(selectBannerList);
+  const enterLoading = useAppSelector(selectEnterLoading);
 
   useEffect(() => {
-    dispatch(getBannerList());
-    dispatch(getRecommendList());
+    if (recommendList.length < 1) {
+      dispatch(getRecommendList());
+    }
+    if (bannerList.length < 1) {
+      dispatch(getBannerList());
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const refresh = () => {
+    dispatch(changeEnterLoading(true));
+    dispatch(getRecommendList());
+  };
+
   return (
     <Content>
-      <Scroll>
+      {enterLoading ? <Loading /> : null}
+      <Scroll onScroll={forceCheck} pullDown={refresh}>
         <div>
           <Slider bannerList={bannerList}></Slider>
           <RecommendList recommendList={recommendList}></RecommendList>
