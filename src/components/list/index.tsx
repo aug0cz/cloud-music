@@ -2,12 +2,14 @@ import React, { memo } from "react";
 import { getCount } from "../../api/utils";
 import { ListWrapper, ListItem, List } from "./style";
 
-interface IRecommend {
-  id: number;
-  picUrl: string;
-  playCount: number;
-  name: string;
-}
+import type { IRecommend } from "../../types/api/recommend";
+
+// export interface IRecommend {
+//   id: number;
+//   picUrl: string;
+//   playCount: number;
+//   name: string;
+// }
 
 type RecommendListProps = {
   recommendList: IRecommend[];
